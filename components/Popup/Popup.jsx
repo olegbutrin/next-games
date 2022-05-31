@@ -30,21 +30,23 @@ const PopupBackground = styled.div`
 
 const PopupContents = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  width: max-content;
   gap: ${(props) => props.theme.sizes.itemSize};
   padding: ${(props) => props.theme.sizes.itemSize};
+  font-size: ${(props) => props.theme.sizes.itemSizeNum + 4 + "px"};
   border-radius: ${(props) => props.theme.sizes.borderRadius};
   color: ${(props) => props.theme.colors.secondary};
   background-color: ${(props) => props.theme.colors.icon};
   position: absolute;
   top: ${(props) => props.size + props.theme.sizes.itemSizeNum + "px"};
   right: 0px;
+  z-index: 9999;
 
   & h4 {
     padding: 0;
     margin: 0;
     font-weight: 700;
-    font-size: small;
     text-transform: uppercase;
     user-select: none;
   }
@@ -68,6 +70,7 @@ const Popup = ({ isVisible, title, size, onClose, children }) => {
       <PopupBackground onClick={onBackgroundClose} />
       <PopupContents size={size} onClick={onContentsClose}>
         <h4>{title}</h4>
+        {children}
       </PopupContents>
     </PopupContainer>
   );

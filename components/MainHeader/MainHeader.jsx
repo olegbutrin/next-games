@@ -26,18 +26,24 @@ const Header = styled.div`
 
   @media (max-width: 480px) {
     grid-template-columns: 1fr min-content;
-    grid-template-areas: 
+    grid-template-areas:
       "L I"
       "S S";
-    }
+    position: fixed;
+    top: 0px;
+    left: 0px;
+  }
 
-    @media (max-width: 240px) {
+  @media (max-width: 240px) {
     grid-template-columns: 1fr;
-    grid-template-areas: 
+    grid-template-areas:
       "L"
       "I"
       "S";
-    }
+    position: fixed;
+    top: 0px;
+    left: 0px;
+  }
 `;
 
 const MainHeader = ({ children }) => {

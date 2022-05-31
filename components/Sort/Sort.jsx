@@ -5,7 +5,13 @@ import styled from "styled-components";
 import Popup from "../Popup/Popup";
 import { Icon, IconWithPopup } from "../../styles/styles";
 import { useState } from "react";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { capFL } from "../../utils/utils";
+import { object } from "prop-types";
+
+const sortNames = ["rating", "name", "data"];
 
 const SortIcon = ({ title }) => {
   return (
@@ -33,7 +39,100 @@ SortIcon.propTypes = {
   title: string.isRequired,
 };
 
+const SortLink = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: ${(props) => props.theme.sizes.itemSize};
+  font-weight: 500;
+  text-decoration: none;
+  font-size: ${(props) => props.theme.sizes.itemSizeNum * 2 + "px"};
+  color: inherit;
+
+  .SortButton {
+    display: inline-block;
+    padding: ${(props) => props.theme.sizes.itemSizeNum / 2 + "px"};
+    padding-right: ${(props) => props.theme.sizes.itemSizeNum * 4 + "px"};
+    border-radius: ${(props) => props.theme.sizes.borderRadius};
+    border: 1px solid black;
+    position: relative;
+    cursor: pointer;
+
+    &:after {
+      display: inline-block;
+      right: 4px;
+      position: absolute;
+    }
+
+    &.desc {
+      &:after {
+        content: "▼";
+      }
+    }
+
+    &.asc {
+      &:after {
+        content: "▲";
+      }
+    }
+  }
+
+  &.current {
+    .direction {
+      &:after {
+        color: ${(props) => props.theme.extra.red};
+      }
+    }
+  }
+`;
+
+const SortItem = ({ query, name }) => {
+  return (
+    <SortLink
+      className={
+        query.ordering && query.ordering.endsWith(name) ? "current" : ""
+      }
+    >
+      <Link href={{ query: { ...query, ordering: name } }}>
+        <div
+          className={
+            "SortButton desc" +
+            (query.ordering && query.ordering.startsWith("-")
+              ? ""
+              : " direction")
+          }
+        >
+          {capFL(name)}
+        </div>
+      </Link>
+      <Link href={{ query: { ...query, ordering: "-" + name } }}>
+        <div
+          className={
+            "SortButton asc" +
+            (query.ordering && query.ordering.startsWith("-")
+              ? " direction"
+              : "")
+          }
+        >
+          {capFL(name)}
+        </div>
+      </Link>
+    </SortLink>
+  );
+};
+
+SortItem.propTypes = {
+  query: object.isRequired,
+  name: string.isRequired,
+};
+
 const Sort = ({ size, theme }) => {
+  const router = useRouter();
+  const [query, setQuery] = useState({});
+
+  useEffect(() => {
+    setQuery({ ...router.query});
+  }, [router.query, setQuery]);
+
   const [menuVisible, setMenuVisible] = useState(false);
 
   const toggleMenu = useCallback(() => {
@@ -50,6 +149,9 @@ const Sort = ({ size, theme }) => {
         title={"Sorting"}
         size={size}
         onClose={toggleMenu}
+        children={sortNames.map((name) => {
+          return <SortItem key={name} query={query} name={name} />;
+        })}
       />
     </IconWithPopup>
   );

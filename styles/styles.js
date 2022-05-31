@@ -13,14 +13,20 @@ export const sizes = {
   itemSize: "8px",
   itemSizeNum: 8,
   globalPadding: {
-    "300": "24px",
-    "600": "32px",
-    "860": "10vw",
-    "1480": "12vw",
-    "1800": "14vw",
+    300: "24px",
+    600: "32px",
+    860: "10vw",
+    1480: "12vw",
+    1800: "14vw",
   },
   borderRadius: "4px",
   fontSize: "16px",
+  cardSize: "320px",
+};
+
+const extra = {
+  yellow: themeColors.yellow,
+  red: themeColors.red,
 };
 
 export const dark = {
@@ -31,6 +37,7 @@ export const dark = {
     background: themeColors.gray,
     icon: themeColors.yellow,
   },
+  extra: extra,
   sizes: sizes,
 };
 
@@ -42,7 +49,13 @@ export const light = {
     background: themeColors.gray,
     icon: themeColors.gray,
   },
+  extra: extra,
   sizes: sizes,
+};
+
+export const GlobalThemes = {
+  true: dark,
+  false: light,
 };
 
 export const Icon = styled.div`
@@ -83,7 +96,12 @@ const GlobalStyle = createGlobalStyle`
     background-color: ${(props) => props.theme.colors.background};
   }
 
+  main {
+    align-content: center;
+  }
+
   .ThemeContainer {
+    overflow: auto;
     background-color: ${(props) => props.theme.colors.secondary};
     animation: fadeIn ease 2s;
 
@@ -131,6 +149,25 @@ const GlobalStyle = createGlobalStyle`
   main {
     width: 100%;
     height: 100vh;
+  }
+
+  .bgWrap {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    border-radius: ${(props) => props.theme.sizes.borderRadius};
+    border: 1px solid transparent;
+    z-index: -1;
+  }
+
+  .bgText {
+    margin: 0;
+    font-size: 1rem;
+    padding-top: 40vh;
+    padding-left: ${(props) => props.theme.sizes.itemSizeNum * 3 + "px"};
+    padding-right: ${(props) => props.theme.sizes.itemSizeNum * 3 + "px"};
+    text-shadow: 2px 2px 2px ${(props) => props.theme.colors.background};
   }
 
 

@@ -9,19 +9,20 @@ import ThemeContainer from "../components/ThemeContainer/ThemeContainer";
 import ThemeSwitcher from "../components/ThemeSwitcher/ThemeSwitcher";
 import { loadTheme, saveTheme } from "../utils/themeSwitcher";
 import { rawToGamesInfo } from "../utils/utils";
-import GlobalStyle, { dark, light, sizes } from "../styles/styles";
+import GlobalStyle, {
+  GlobalThemes,
+  dark,
+  light,
+  sizes,
+} from "../styles/styles";
 import Filter from "../components/Filter/Filter";
 import { useRouter } from "next/router";
-
-const GlobalThemes = {
-  true: dark,
-  false: light,
-};
+import MainContent from "../components/MainContent/MainContent";
+import GameCard from "../components/GameCard/GameCard";
+import { API_URL, PAGE_SIZE } from "../utils/api";
+import NextPreviousLinks from "../components/NextPreviousLinks/NextPreviousLinks";
 
 export default function Home({ gamesInfo }) {
-  // const router = useRouter();
-  // const [page, setPage] = useState(parseInt(router.query.page) || 1);
-
   const [theme, setTheme] = useState(true);
   const swapTheme = useCallback(() => {
     saveTheme(GlobalThemes[!theme].name);
@@ -51,16 +52,24 @@ export default function Home({ gamesInfo }) {
             <Logo height={32} />
             <Search height={22} color={GlobalThemes[theme].colors.secondary} />
             <div className="IconContainer">
+              <Sort size={20} />
+              <Filter size={20} />
               <ThemeSwitcher
                 size={24}
                 inactive={GlobalThemes[!theme].name}
                 onClick={swapTheme}
               />
-              <Sort size={20} />
-              <Filter size={20} />
             </div>
           </MainHeader>
-          <div>Games count: {gamesInfo.count}</div>
+          <MainContent>
+            {gamesInfo.results.map((game) => {
+              return <GameCard key={game.slug} game={game} />;
+            })}
+          </MainContent>
+          <NextPreviousLinks
+            previous={gamesInfo.previous}
+            next={gamesInfo.next}
+          />
         </main>
         <footer></footer>
       </div>
@@ -69,15 +78,18 @@ export default function Home({ gamesInfo }) {
 }
 
 export async function getServerSideProps(context) {
-  const API_URL = "https://api.rawg.io/api/games";
-  const PAGE_SIZE = 20;
+  const fullQuery = {
+    ...context.query,
+    page_size: PAGE_SIZE,
+    key: process.env.apiKey,
+  };
+  const queryParams = new URLSearchParams(fullQuery);
+  queryParams.append("search_precise", true);
 
-  console.log(context.query);
-  const data = await (
-    await fetch(
-      `https://api.rawg.io/api/games?key=0fd7438156a34f4789ffd3ccc1ffb799&page_size=20`
-    )
-  )?.json();
+  const url = [API_URL, queryParams.toString()].join("?");
+  console.log(url);
+
+  const data = await (await fetch(url))?.json();
   const gamesInfo = rawToGamesInfo(data);
   return {
     props: {

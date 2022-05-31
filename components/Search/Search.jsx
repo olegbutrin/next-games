@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { string } from "prop-types";
 import { number } from "prop-types";
 import React from "react";
@@ -74,6 +75,8 @@ const SearchForm = styled.form`
 `;
 
 const Search = ({ height, color }) => {
+  const router = useRouter();
+
   const [searchIcon, setSearchIcon] = useState("");
 
   useEffect(() => {
