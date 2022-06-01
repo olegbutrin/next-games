@@ -1,4 +1,10 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Next Games
+
+Демо Next.js SSR приложения, демонстрирующее работу с API.
+
+Написано по [тестовому заданию](https://docs.google.com/document/d/1LQ7olXMcjNKF_vHoPqm8VsJc65K3PfW5M3s9D1EO8xs/edit)
+
+Тестовая версия приложения на Vercel: [next games](https://next-games-five.vercel.app/).
 
 ## Getting Started
 
