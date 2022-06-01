@@ -27,7 +27,7 @@ export default function Home({ gamesInfo }) {
   const swapTheme = useCallback(() => {
     saveTheme(GlobalThemes[!theme].name);
     setTheme(!theme);
-  }, [theme, setTheme, GlobalThemes]);
+  }, [theme, setTheme]);
 
   useEffect(() => {
     const loadedTheme = loadTheme();
@@ -36,7 +36,7 @@ export default function Home({ gamesInfo }) {
     } else {
       setTheme(false);
     }
-  }, [setTheme, GlobalThemes]);
+  }, [setTheme]);
 
   return (
     <ThemeProvider theme={GlobalThemes[theme]}>

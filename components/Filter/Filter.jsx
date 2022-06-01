@@ -97,21 +97,20 @@ const Filter = ({ size }) => {
         title={"Filter Games by Platform:"}
         size={size}
         onClose={toggleMenu}
-        children={
-          <FilterList>
-            {filterNames.map((name, index) => {
-              return (
-                <FilterItem
-                  key={"filter_" + index}
-                  guery={query}
-                  name={name}
-                  id={filterIDS[index]}
-                />
-              );
-            })}
-          </FilterList>
-        }
-      />
+      >
+        <FilterList>
+          {filterNames.map((name, index) => {
+            return (
+              <FilterItem
+                key={"filter_" + index}
+                guery={query}
+                name={name}
+                id={filterIDS[index]}
+              />
+            );
+          })}
+        </FilterList>
+      </Popup>
     </IconWithPopup>
   );
 };

@@ -68,6 +68,7 @@ const Slider = ({ slides }) => {
                 src={slide.image}
                 layout={"fill"}
                 objectFit={"cover"}
+                alt={"Game Slide"}
               ></Image>
             </div>
           );

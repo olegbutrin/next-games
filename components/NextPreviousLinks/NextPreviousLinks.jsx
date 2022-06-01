@@ -101,11 +101,11 @@ const NextPreviousLinks = ({ previous, next }) => {
 
   const routePrevious = useCallback(() => {
     routePage(prevPage);
-  }, [prevPage]);
+  }, [prevPage, routePage]);
 
   const routeNext = useCallback(() => {
     routePage(nextPage);
-  }, [nextPage]);
+  }, [nextPage, routePage]);
 
 
   return (

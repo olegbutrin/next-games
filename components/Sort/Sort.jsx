@@ -149,10 +149,11 @@ const Sort = ({ size, theme }) => {
         title={"Sort Games By:"}
         size={size}
         onClose={toggleMenu}
-        children={sortNames.map((name) => {
+      >
+        {sortNames.map((name) => {
           return <SortItem key={name} query={query} name={name} />;
         })}
-      />
+      </Popup>
     </IconWithPopup>
   );
 };

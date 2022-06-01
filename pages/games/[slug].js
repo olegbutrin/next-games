@@ -91,7 +91,7 @@ const Game = ({ game, screenshots }) => {
   const swapTheme = useCallback(() => {
     saveTheme(GlobalThemes[!theme].name);
     setTheme(!theme);
-  }, [theme, setTheme, GlobalThemes]);
+  }, [theme, setTheme]);
 
   useEffect(() => {
     const loadedTheme = loadTheme();
@@ -100,7 +100,7 @@ const Game = ({ game, screenshots }) => {
     } else {
       setTheme(false);
     }
-  }, [setTheme, GlobalThemes]);
+  }, [setTheme]);
 
   return (
     <ThemeProvider theme={GlobalThemes[theme]}>
@@ -130,7 +130,7 @@ const Game = ({ game, screenshots }) => {
             </Info>
             <GameHeader>
               <h2>{game.name}</h2>
-              <a href={game.website} target={"_blank"}>
+              <a href={game.website} target={"_blank"} rel="noreferrer">
                 <LinkIcon
                   title={game.name + "website"}
                   size={"32px"}
