@@ -11,6 +11,12 @@ const Content = styled.div`
   margin-top: ${(props) => props.theme.sizes.itemSizeNum * 4 + "px"};
   padding-bottom: ${(props) => props.theme.sizes.itemSizeNum * 8 + "px"};
 
+
+  @media (min-width: 1200px) {
+    padding-left: calc((100% - 800px) / 2);
+    padding-right: calc((100% - 800px) / 2);
+  }
+
   @media (max-width: 700px) {
     margin-left: auto;
     margin-right: auto;
