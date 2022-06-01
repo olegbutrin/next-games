@@ -1,7 +1,17 @@
 import { string } from "prop-types";
 import { number } from "prop-types";
 import React from "react";
-import { Icon } from "../../styles/styles";
+import styled from "styled-components";
+import Popup from "../Popup/Popup";
+import { Icon, IconWithPopup } from "../../styles/styles";
+import { useState } from "react";
+import { useCallback, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { object } from "prop-types";
+
+const filterNames = ["PC", "iOS", "Android"];
+const filterIDS = [4, 3, 21];
 
 const PadIcon = ({ title }) => {
   return (
@@ -31,11 +41,78 @@ PadIcon.propTypes = {
   title: string.isRequired,
 };
 
-const Filter = ({ size }) => {
+const FilterList = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: ${(props) => props.theme.sizes.itemSize};
+  font-weight: 500;
+  text-decoration: none;
+  font-size: ${(props) => props.theme.sizes.itemSizeNum * 2 + "px"};
+  color: inherit;
+
+  .FilterButton {
+    display: inline-block;
+    padding: ${(props) => props.theme.sizes.itemSizeNum / 2 + "px"};
+    border-radius: ${(props) => props.theme.sizes.borderRadius};
+    border: 1px solid ${(props) => props.theme.colors.secondary};
+    cursor: pointer;
+  }
+`;
+
+const FilterItem = ({ query, name, id }) => {
   return (
-    <Icon size={size} onClick={() => {}} aria-label={"Filter by Platform"}>
-      <PadIcon title="Filter by Platform" />
-    </Icon>
+    <Link href={{ query: { ...query, platforms: String(id) } }}>
+      <div className="FilterButton">{name}</div>
+    </Link>
+  );
+};
+
+FilterItem.propTypes = {
+  query: object,
+  name: string.isRequired,
+  id: number,
+};
+
+const Filter = ({ size }) => {
+  const router = useRouter();
+  const [query, setQuery] = useState({});
+
+  useEffect(() => {
+    setQuery({ ...router.query });
+  }, [router.query, setQuery]);
+
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  const toggleMenu = useCallback(() => {
+    setMenuVisible(!menuVisible);
+  }, [menuVisible, setMenuVisible]);
+
+  return (
+    <IconWithPopup>
+      <Icon size={size} onClick={toggleMenu} aria-label={"Filter by Platform"}>
+        <PadIcon title="Filter by Platform" />
+      </Icon>
+      <Popup
+        isVisible={menuVisible}
+        title={"Filter Games by Platform:"}
+        size={size}
+        onClose={toggleMenu}
+        children={
+          <FilterList>
+            {filterNames.map((name, index) => {
+              return (
+                <FilterItem
+                  key={"filter_" + index}
+                  guery={query}
+                  name={name}
+                  id={filterIDS[index]}
+                />
+              );
+            })}
+          </FilterList>
+        }
+      />
+    </IconWithPopup>
   );
 };
 

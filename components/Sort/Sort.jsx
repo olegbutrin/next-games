@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 import { capFL } from "../../utils/utils";
 import { object } from "prop-types";
 
-const sortNames = ["rating", "name", "data"];
+const sortNames = ["rating", "name", "released"];
 
 const SortIcon = ({ title }) => {
   return (
@@ -53,7 +53,7 @@ const SortLink = styled.div`
     padding: ${(props) => props.theme.sizes.itemSizeNum / 2 + "px"};
     padding-right: ${(props) => props.theme.sizes.itemSizeNum * 4 + "px"};
     border-radius: ${(props) => props.theme.sizes.borderRadius};
-    border: 1px solid black;
+    border: 1px solid ${(props) => props.theme.colors.secondary};
     position: relative;
     cursor: pointer;
 
@@ -65,13 +65,13 @@ const SortLink = styled.div`
 
     &.desc {
       &:after {
-        content: "▼";
+        content: "▲";
       }
     }
 
     &.asc {
       &:after {
-        content: "▲";
+        content: "▼";
       }
     }
   }
@@ -92,18 +92,6 @@ const SortItem = ({ query, name }) => {
         query.ordering && query.ordering.endsWith(name) ? "current" : ""
       }
     >
-      <Link href={{ query: { ...query, ordering: name } }}>
-        <div
-          className={
-            "SortButton desc" +
-            (query.ordering && query.ordering.startsWith("-")
-              ? ""
-              : " direction")
-          }
-        >
-          {capFL(name)}
-        </div>
-      </Link>
       <Link href={{ query: { ...query, ordering: "-" + name } }}>
         <div
           className={
@@ -111,6 +99,18 @@ const SortItem = ({ query, name }) => {
             (query.ordering && query.ordering.startsWith("-")
               ? " direction"
               : "")
+          }
+        >
+          {capFL(name)}
+        </div>
+      </Link>
+      <Link href={{ query: { ...query, ordering: name } }}>
+        <div
+          className={
+            "SortButton desc" +
+            (query.ordering && query.ordering.startsWith("-")
+              ? ""
+              : " direction")
           }
         >
           {capFL(name)}
@@ -130,7 +130,7 @@ const Sort = ({ size, theme }) => {
   const [query, setQuery] = useState({});
 
   useEffect(() => {
-    setQuery({ ...router.query});
+    setQuery({ ...router.query });
   }, [router.query, setQuery]);
 
   const [menuVisible, setMenuVisible] = useState(false);
@@ -146,7 +146,7 @@ const Sort = ({ size, theme }) => {
       </Icon>
       <Popup
         isVisible={menuVisible}
-        title={"Sorting"}
+        title={"Sort Games By:"}
         size={size}
         onClose={toggleMenu}
         children={sortNames.map((name) => {

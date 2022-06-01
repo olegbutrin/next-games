@@ -87,7 +87,7 @@ export async function getServerSideProps(context) {
   queryParams.append("search_precise", true);
 
   const url = [API_URL, queryParams.toString()].join("?");
-  console.log(url);
+  // console.log(url);
 
   const data = await (await fetch(url))?.json();
   const gamesInfo = rawToGamesInfo(data);

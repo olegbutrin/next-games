@@ -8,14 +8,85 @@ import Sort from "../../components/Sort/Sort";
 import ThemeContainer from "../../components/ThemeContainer/ThemeContainer";
 import ThemeSwitcher from "../../components/ThemeSwitcher/ThemeSwitcher";
 import { loadTheme, saveTheme } from "../../utils/themeSwitcher";
-import GlobalStyle, { GlobalThemes, dark, light, sizes } from "../../styles/styles";
+import GlobalStyle, {
+  GlobalThemes,
+  dark,
+  light,
+  sizes,
+} from "../../styles/styles";
 import Filter from "../../components/Filter/Filter";
 import { useRouter } from "next/router";
 import MainContent from "../../components/MainContent/MainContent";
 import GameCard from "../../components/GameCard/GameCard";
 import { rawToSingleGameInfo } from "../../utils/utils";
+import { API_URL } from "../../utils/api";
+import Slider from "../../components/Slider/Slider";
+import Rating from "../../components/Rating/Rating";
+import GameContent from "../../components/GameContent/GameContent";
+import styled from "styled-components";
+import BackLink from "../../components/BackLink/BackLink";
 
-const Game = ({ game }) => {
+const LinkIcon = ({ title, size, color }) => {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24">
+      <title>{title}</title>
+      <path
+        fill={color}
+        d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12zm8-4c-.66 0-1.628.19-2.46.788C6.659 9.424 6 10.474 6 12c0 1.526.658 2.576 1.54 3.211A4.35 4.35 0 0 0 10 16a1 1 0 1 0 0-2c-.34 0-.872-.11-1.29-.412C8.341 13.325 8 12.874 8 12c0-.874.342-1.324.71-1.588C9.127 10.11 9.66 10 10 10a1 1 0 1 0 0-2zm4 0a1 1 0 1 0 0 2c.34 0 .872.11 1.29.412.368.264.71.714.71 1.588 0 .874-.342 1.324-.71 1.588-.418.302-.95.412-1.29.412a1 1 0 1 0 0 2c.66 0 1.628-.19 2.46-.789C17.341 14.576 18 13.526 18 12c0-1.526-.658-2.576-1.54-3.212A4.35 4.35 0 0 0 14 8zm-4 3a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2h-4z"
+      />
+    </svg>
+  );
+};
+
+const GameHeader = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: ${(props) => props.theme.sizes.itemSize};
+
+  h2 {
+    color: ${(props) => props.theme.colors.primary};
+  }
+`;
+
+const Info = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  color: ${(props) => props.theme.colors.primary};
+  gap: ${(props) => props.theme.sizes.itemSize};
+`;
+
+const DataInfo = styled.div`
+  font-size: ${(props) => props.theme.sizes.itemSizeNum * 2.5 + "px"};
+  font-weight: 500;
+`;
+
+const PlatformInfo = styled.div`
+  font-size: ${(props) => props.theme.sizes.itemSizeNum * 1.5 + "px"};
+  color: ${(props) => props.theme.colors.primary};
+  font-weight: 500;
+  text-align: center;
+`;
+
+const Description = styled.div`
+  display: block;
+  width: 100%;
+  background-color: ${(props) => props.theme.colors.secondary};
+  color: ${(props) => props.theme.colors.primary};
+  border-radius: ${(props) => props.theme.sizes.borderRadius};
+  border: 1px solid ${(props) => props.theme.colors.primary};
+  padding: ${(props) => props.theme.sizes.itemSizeNum * 2 + "px"};
+
+  p {
+    margin-bottom: ${(props) => props.theme.sizes.itemSize};
+  }
+`;
+
+const Game = ({ game, screenshots }) => {
   const [theme, setTheme] = useState(true);
   const swapTheme = useCallback(() => {
     saveTheme(GlobalThemes[!theme].name);
@@ -31,8 +102,6 @@ const Game = ({ game }) => {
     }
   }, [setTheme, GlobalThemes]);
 
-  console.log(game)
-
   return (
     <ThemeProvider theme={GlobalThemes[theme]}>
       <GlobalStyle />
@@ -45,10 +114,7 @@ const Game = ({ game }) => {
         <main>
           <MainHeader>
             <Logo height={32} />
-            <Search height={22} color={GlobalThemes[theme].colors.secondary} />
             <div className="IconContainer">
-              <Sort size={20} />
-              <Filter size={20} />
               <ThemeSwitcher
                 size={24}
                 inactive={GlobalThemes[!theme].name}
@@ -56,7 +122,34 @@ const Game = ({ game }) => {
               />
             </div>
           </MainHeader>
-          <MainContent>{game.name}</MainContent>
+          <GameContent>
+            <Slider slides={screenshots.results}></Slider>
+            <Info>
+              <Rating rating={game.rating ? game.rating : 0} />
+              <DataInfo>{game.released}</DataInfo>
+            </Info>
+            <GameHeader>
+              <h2>{game.name}</h2>
+              <a href={game.website} target={"_blank"}>
+                <LinkIcon
+                  title={game.name + "website"}
+                  size={"32px"}
+                  color={GlobalThemes[theme].colors.icon}
+                />
+              </a>
+            </GameHeader>
+            <Description
+              dangerouslySetInnerHTML={{ __html: game.description }}
+            ></Description>
+            <PlatformInfo>
+              {game.platforms
+                .map((platform) => {
+                  return platform.platform.name;
+                })
+                .join(" ∙ ")}
+            </PlatformInfo>
+            <BackLink slug={game.slug} />
+          </GameContent>
         </main>
         <footer></footer>
       </div>
@@ -67,19 +160,28 @@ const Game = ({ game }) => {
 export default Game;
 
 export async function getServerSideProps(context) {
-  const API_URL = "https://api.rawg.io/api/games";
-  const PAGE_SIZE = 40;
+  const fullQuery = {
+    ...context.query,
+    key: process.env.apiKey,
+  };
+  const queryParams = new URLSearchParams(fullQuery);
+  const slug = queryParams.get("slug");
+  queryParams.delete("slug");
+  const baseUrl = [`${API_URL}/${slug}`, queryParams.toString()].join("?");
+  const screenUrl = [
+    `${API_URL}/${slug}/screenshots`,
+    queryParams.toString(),
+  ].join("?");
 
-  // console.log(context.query);
-  const data = await (
-    await fetch(
-      `https://api.rawg.io/api/games/${context.query.slug}?key=0fd7438156a34f4789ffd3ccc1ffb799`
-    )
-  )?.json();
+  const data = await (await fetch(baseUrl))?.json();
+
+  const screenshots = await (await fetch(screenUrl))?.json();
+
   const game = rawToSingleGameInfo(data);
   return {
     props: {
       game,
+      screenshots,
     },
   };
 }

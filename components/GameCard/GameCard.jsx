@@ -1,9 +1,10 @@
 import { object } from "prop-types";
-import React from "react";
+import React, { useCallback } from "react";
 import Link from "next/link";
 import styled from "styled-components";
 import Image from "next/image";
 import Rating from "../Rating/Rating";
+import { useRouter } from "next/router";
 
 const Card = styled.div`
   display: flex;
@@ -44,8 +45,15 @@ const DataInfo = styled.div`
 `;
 
 const GameCard = ({ game }) => {
+  const router = useRouter();
+
+  const goWithAnchor = useCallback(() => {
+    router.replace(router.asPath.replace(/#.+$/, "") + "#game_" + game.slug);
+    router.push(`/games/${encodeURIComponent(game.slug)}`);
+  }, [game.slug, router]);
+
   return (
-    <Card>
+    <Card id={"game_" + game.slug}>
       {game.background_image && (
         <div className="bgWrap">
           <Image
@@ -58,9 +66,9 @@ const GameCard = ({ game }) => {
         </div>
       )}
       <Link href={`/games/${encodeURIComponent(game.slug)}`}>
-        <div className="TextBackground">
+        <div className="TextBackground" onClick={goWithAnchor}>
           <h3>{game.name}</h3>
-          <Rating rating={game.rating} />
+          <Rating rating={game.rating ? game.rating : 0} />
           <DataInfo>{game.released}</DataInfo>
         </div>
       </Link>

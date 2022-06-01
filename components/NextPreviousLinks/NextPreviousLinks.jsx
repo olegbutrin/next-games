@@ -6,12 +6,13 @@ import { any } from "prop-types";
 import { string } from "prop-types";
 import React, { useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
-import { API_URL, clearPageLink } from "../../utils/api";
+import { API_URL, clearPageLink, getPrevPageLink } from "../../utils/api";
 
 const LinksBar = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: flex-start;
   padding-top: ${(props) => props.theme.sizes.itemSizeNum * 2 + "px"};
   padding-bottom: ${(props) => props.theme.sizes.itemSizeNum * 4 + "px"};
 
@@ -28,6 +29,7 @@ const LinksBar = styled.div`
     position: relative;
     cursor: pointer;
     user-select: none;
+    white-space: nowrap;
 
     &.disabled {
       cursor: inherit;
@@ -36,35 +38,75 @@ const LinksBar = styled.div`
   }
 `;
 
+const Pager = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: ${(props) => props.theme.sizes.itemSizeNum * 2 + "px"};
+  justify-content: center;
+  align-items: center;
+  padding-left: ${(props) => props.theme.sizes.itemSizeNum * 4 + "px"};
+  padding-right: ${(props) => props.theme.sizes.itemSizeNum * 4 + "px"};
+
+
+  .PageLink {
+    border-radius: 100%;
+    background-color: ${(props) => props.theme.extra.yellow};
+    height: ${(props) => props.theme.sizes.itemSizeNum * 2 + "px"};
+    width: ${(props) => props.theme.sizes.itemSizeNum * 2 + "px"};
+    cursor: pointer;
+  }
+
+  @media (max-width: 600px) {
+      display: none;
+    }
+
+`;
+
 const NextPreviousLinks = ({ previous, next }) => {
   const router = useRouter();
   const [prevPage, setPrevPage] = useState(null);
   const [nextPage, setNextPage] = useState(null);
+  const [allPages, setAllPages] = useState([]);
 
   useEffect(() => {
     if (previous) {
       setPrevPage(clearPageLink(previous));
     }
     if (next) {
-      setNextPage(clearPageLink(next));
+      let link = clearPageLink(next);
+      setNextPage(link);
+      const all = [];
+      let prev = getPrevPageLink(link, 1);
+      while (link !== prev) {
+        all.push(prev);
+        link = prev;
+        prev = getPrevPageLink(link, 1);
+      }
+      all.reverse();
+      setAllPages(all);
     }
-  }, [previous, next, setPrevPage, setNextPage]);
+  }, [previous, next, setPrevPage, setNextPage, setAllPages]);
+
+  const routePage = useCallback(
+    (page) => {
+      router
+        .push(page)
+        .then(() =>
+          document.getElementsByClassName("ThemeContainer")[0].scrollTo(0, 0)
+        );
+    },
+    [router]
+  );
 
   const routePrevious = useCallback(() => {
-    router
-      .push(prevPage)
-      .then(() =>
-        document.getElementsByClassName("ThemeContainer")[0].scrollTo(0, 0)
-      );
+    routePage(prevPage);
   }, [prevPage]);
 
   const routeNext = useCallback(() => {
-    router
-      .push(nextPage)
-      .then(() =>
-        document.getElementsByClassName("ThemeContainer")[0].scrollTo(0, 0)
-      );
+    routePage(nextPage);
   }, [nextPage]);
+
 
   return (
     <LinksBar className="TopLevel">
@@ -74,6 +116,13 @@ const NextPreviousLinks = ({ previous, next }) => {
         </div>
       )}
       {!prevPage && <div className="ButtonLink disabled">Prev Page</div>}
+
+      <Pager>
+        {allPages.map((page, index) => {
+          return <Link key={"Link_" + (index + 1)} href={page} ><div className="PageLink" title={"Go to Page " + (index + 1)}></div></Link>;
+        })}
+      </Pager>
+
       {nextPage && (
         <div className="ButtonLink" onClick={routeNext}>
           Next Page

@@ -19,14 +19,16 @@ export const rawToGamesInfo = (data) => {
 
 export const rawToSingleGameInfo = (data) => {
   return {
-    slug: data.slug || null,
-    name: data.name || null,
-    platforms: data.platforms || null,
-    released: data.released || null,
-    background_image: data.background_image || null,
+    slug: data.slug || "",
+    name: data.name || "",
+    platforms: data.platforms || [],
+    released: data.released || "",
+    background_image: data.background_image || "",
     rating: data.rating || null,
-    short_screenshots: data.short_screenshots || null,
-    description: data.description || null,
+    short_screenshots: data.short_screenshots || [],
+    description: data.description || "",
+    website: data.website || "",
+
   };
 }
 
